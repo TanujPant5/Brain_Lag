@@ -47,6 +47,9 @@ auth.onAuthStateChanged((user) => {
     if (user) {
         console.log("✅ User logged in:", user.email || "Anonymous");
         onUserLoggedIn(user);
+        
+        // Dispatch custom event for app.js to catch
+        document.dispatchEvent(new Event('userLoggedIn'));
     } else {
         console.log("❌ User logged out");
         onUserLoggedOut();
@@ -442,7 +445,7 @@ async function createCrewAlert(userId, stressData) {
     }
 }
 
-// Get stress history
+// Get stress history (Updated to support variable limits)
 async function getStressHistory(limit = 10) {
     if (!currentUser) return { success: false, data: [] };
     
@@ -462,6 +465,34 @@ async function getStressHistory(limit = 10) {
         
     } catch (error) {
         console.error("Error getting stress history:", error);
+        return { success: false, data: [] };
+    }
+}
+
+// NEW: Get stress history by date range (e.g., last 7 days)
+async function getStressHistoryByDate(days = 7) {
+    if (!currentUser) return { success: false, data: [] };
+    
+    try {
+        const date = new Date();
+        date.setDate(date.getDate() - days);
+        const timestamp = firebase.firestore.Timestamp.fromDate(date);
+
+        const snapshot = await db.collection('users').doc(currentUser.uid)
+            .collection('stressHistory')
+            .where('timestamp', '>', timestamp)
+            .orderBy('timestamp', 'desc')
+            .get();
+        
+        const history = [];
+        snapshot.forEach(doc => {
+            history.push({ id: doc.id, ...doc.data() });
+        });
+        
+        return { success: true, data: history };
+        
+    } catch (error) {
+        console.error("Error getting weekly stress history:", error);
         return { success: false, data: [] };
     }
 }

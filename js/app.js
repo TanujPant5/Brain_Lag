@@ -31,6 +31,9 @@ const avgStress = document.getElementById('avgStress');
 
 const highStressModal = document.getElementById('highStressModal');
 
+// Chart instance
+let stressChartInstance = null;
+
 if (moodLevelInput) {
     moodLevelInput.addEventListener('input', (e) => {
         moodValueDisplay.textContent = e.target.value;
@@ -79,6 +82,9 @@ async function handleStressCheck(e) {
     await saveStressCheck(stressData);
     
     updateLocalStats(stressResult.level);
+    
+    // Refresh history chart and report after new data submission
+    await loadStressHistory();
     
     if (stressResult.level === 'high') {
         showHighStressModal();
@@ -406,6 +412,185 @@ function updateLocalStats(level) {
     }
 }
 
+// -------------------- 
+// Analytics & History
+// --------------------
+
+// Load and Render Stress History Graph and Weekly Report
+async function loadStressHistory() {
+    const chartCanvas = document.getElementById('stressChart');
+    if (!chartCanvas) return;
+
+    // Fetch history using function from firebase.js
+    // We assume getStressHistory is updated or we pass a larger limit
+    const response = await getStressHistory(20); // Get last 20 records
+    
+    if (!response.success || response.data.length === 0) {
+        // Handle empty state if needed
+        return;
+    }
+
+    // Process data for Chart.js
+    // Sort chronological: oldest to newest
+    const historyData = response.data.reverse(); 
+    
+    const labels = historyData.map(entry => {
+        const date = entry.timestamp ? (entry.timestamp.toDate ? entry.timestamp.toDate() : new Date(entry.timestamp)) : new Date();
+        return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    });
+    
+    const scores = historyData.map(entry => entry.score);
+
+    // Destroy previous chart if exists
+    if (stressChartInstance) {
+        stressChartInstance.destroy();
+    }
+
+    // Render Chart
+    const ctx = chartCanvas.getContext('2d');
+    
+    // Create gradient
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(34, 211, 238, 0.5)'); // Cyan
+    gradient.addColorStop(1, 'rgba(99, 102, 241, 0.0)'); // Purple transparent
+
+    stressChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: t('label_stress_score', 'Stress Score'),
+                data: scores,
+                borderColor: '#22d3ee',
+                backgroundColor: gradient,
+                borderWidth: 2,
+                pointBackgroundColor: '#fff',
+                pointBorderColor: '#6366f1',
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(13, 13, 20, 0.9)',
+                    titleColor: '#fff',
+                    bodyColor: '#cbd5e1',
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    borderWidth: 1,
+                    displayColors: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.05)'
+                    },
+                    ticks: {
+                        color: '#9ca3af'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        color: '#9ca3af'
+                    }
+                }
+            }
+        }
+    });
+
+    // Generate Weekly Report based on this data
+    generateWeeklyReport(historyData);
+}
+
+function generateWeeklyReport(historyData) {
+    const reportContainer = document.getElementById('weeklyReportContent');
+    if (!reportContainer) return;
+
+    if (historyData.length === 0) {
+        reportContainer.innerHTML = `<p class="text-gray-400 text-sm">${t('report_no_data', 'Not enough data for a weekly report yet.')}</p>`;
+        return;
+    }
+
+    // Calculate averages
+    const totalScore = historyData.reduce((sum, item) => sum + (item.score || 0), 0);
+    const avgScore = Math.round(totalScore / historyData.length);
+    
+    // Determine trend (compare first half vs second half if enough data)
+    let trend = 'stable';
+    let trendIcon = '➡️';
+    let trendColor = 'text-yellow-400';
+    
+    if (historyData.length >= 2) {
+        const recentAvg = historyData.slice(-Math.ceil(historyData.length / 2)).reduce((sum, i) => sum + i.score, 0) / Math.ceil(historyData.length / 2);
+        const olderAvg = historyData.slice(0, Math.floor(historyData.length / 2)).reduce((sum, i) => sum + i.score, 0) / Math.floor(historyData.length / 2);
+        
+        if (recentAvg < olderAvg - 5) {
+            trend = 'improving';
+            trendIcon = '↘️';
+            trendColor = 'text-green-400';
+        } else if (recentAvg > olderAvg + 5) {
+            trend = 'worsening';
+            trendIcon = '↗️';
+            trendColor = 'text-red-400';
+        }
+    }
+
+    // Find primary stressor (simplified analysis)
+    let stressors = { sleep: 0, mood: 0, heart: 0 };
+    historyData.forEach(item => {
+        if (item.sleepHours < 6) stressors.sleep++;
+        if (item.moodLevel <= 4) stressors.mood++;
+        if (item.heartRate > 90) stressors.heart++;
+    });
+
+    // Determine main recommendation based on highest stressor count
+    let suggestion = t('suggestion_general', 'Maintain a balanced routine.');
+    if (stressors.sleep >= stressors.mood && stressors.sleep >= stressors.heart && stressors.sleep > 0) {
+        suggestion = t('suggestion_sleep', 'Focus on improving sleep quality.');
+    } else if (stressors.mood >= stressors.sleep && stressors.mood >= stressors.heart && stressors.mood > 0) {
+        suggestion = t('suggestion_mood', 'Try relaxation games to boost mood.');
+    } else if (stressors.heart >= stressors.sleep && stressors.heart >= stressors.mood && stressors.heart > 0) {
+        suggestion = t('suggestion_heart', 'Practice breathing exercises daily.');
+    }
+
+    reportContainer.innerHTML = `
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <div class="text-sm text-gray-400">${t('label_weekly_avg', 'Average Stress')}</div>
+                <div class="font-orbitron text-2xl font-bold ${avgScore > 50 ? 'text-red-400' : 'text-cyan-400'}">${avgScore}/100</div>
+            </div>
+            <div class="text-right">
+                <div class="text-sm text-gray-400">${t('label_trend', 'Trend')}</div>
+                <div class="font-bold ${trendColor} flex items-center gap-1 justify-end">
+                    ${trendIcon} <span class="capitalize">${t('trend_' + trend, trend)}</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="p-3 bg-white/5 rounded-lg border border-white/10">
+            <h4 class="font-semibold text-sm mb-1 text-purple-400">💡 ${t('label_suggestion', 'AI Suggestion')}</h4>
+            <p class="text-xs text-gray-300">${suggestion}</p>
+        </div>
+        
+        <div class="mt-4 text-xs text-center text-gray-500">
+            ${t('report_footer', 'Based on your last {count} check-ins').replace('{count}', historyData.length)}
+        </div>
+    `;
+}
+
 function simulateHeartRate() {
     const baseRate = 72;
     const variation = Math.floor(Math.random() * 30) - 10;
@@ -447,6 +632,18 @@ document.addEventListener('DOMContentLoaded', () => {
     if (lastCheckTime) {
         lastCheckTime.textContent = '--:--';
     }
+
+    // Attempt to load history if user is already logged in or after brief delay
+    setTimeout(() => {
+        if (typeof currentUser !== 'undefined' && currentUser) {
+            loadStressHistory();
+        }
+    }, 2000);
+});
+
+// Also listen for a custom event from firebase.js when login completes
+document.addEventListener('userLoggedIn', () => {
+    loadStressHistory();
 });
 
 document.addEventListener('keydown', (e) => {

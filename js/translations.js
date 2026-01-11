@@ -170,6 +170,24 @@ const TRANSLATIONS = {
         rec_crew_desc: "Social connection can help reduce stress. Check in with your crewmates.",
         btn_view_crew: "View Crew",
 
+        // Analytics & Reports (NEW)
+        history_title: "Stress History",
+        report_title: "Weekly Report",
+        loading_report: "Loading weekly analysis...",
+        label_stress_score: "Stress Score",
+        report_no_data: "Not enough data for a weekly report yet.",
+        label_weekly_avg: "Average Stress",
+        label_trend: "Trend",
+        trend_stable: "Stable",
+        trend_improving: "Improving",
+        trend_worsening: "Worsening",
+        label_suggestion: "AI Suggestion",
+        suggestion_general: "Maintain a balanced routine.",
+        suggestion_sleep: "Focus on improving sleep quality.",
+        suggestion_mood: "Try relaxation games to boost mood.",
+        suggestion_heart: "Practice breathing exercises daily.",
+        report_footer: "Based on your last {count} check-ins",
+
         // Crew Dashboard
         crew_title: "Crew Status Dashboard",
         crew_subtitle: "Real-time monitoring of your crewmates' well-being. Privacy-first: only stress levels are shared.",
@@ -418,7 +436,25 @@ const TRANSLATIONS = {
         btn_offer_support: "Ofrecer Apoyo",
         toast_support_sent: "Apoyo Enviado",
         toast_crew_alert: "Alerta de Tripulación",
-        fallback_default_1: "Estoy aquí para escucharte y apoyarte. ¿Podrías contarme más sobre lo que piensas? 🌟"
+        fallback_default_1: "Estoy aquí para escucharte y apoyarte. ¿Podrías contarme más sobre lo que piensas? 🌟",
+        
+        // Analytics & Reports (NEW)
+        history_title: "Historial de Estrés",
+        report_title: "Reporte Semanal",
+        loading_report: "Cargando análisis...",
+        label_stress_score: "Puntaje de Estrés",
+        report_no_data: "No hay suficientes datos aún.",
+        label_weekly_avg: "Promedio",
+        label_trend: "Tendencia",
+        trend_stable: "Estable",
+        trend_improving: "Mejorando",
+        trend_worsening: "Empeorando",
+        label_suggestion: "Sugerencia IA",
+        suggestion_general: "Mantén una rutina equilibrada.",
+        suggestion_sleep: "Mejora la calidad del sueño.",
+        suggestion_mood: "Prueba juegos de relajación.",
+        suggestion_heart: "Practica ejercicios de respiración.",
+        report_footer: "Basado en tus últimos {count} registros"
     },
 
     // =========================================================================
@@ -474,7 +510,25 @@ const TRANSLATIONS = {
         constellation_title: "Relier les Constellations",
         crew_title: "Tableau de Bord Équipage",
         btn_offer_support: "Offrir du Soutien",
-        fallback_default_1: "Je suis là pour vous écouter. Pouvez-vous m'en dire plus ? 🌟"
+        fallback_default_1: "Je suis là pour vous écouter. Pouvez-vous m'en dire plus ? 🌟",
+        
+        // Analytics & Reports (NEW)
+        history_title: "Historique de Stress",
+        report_title: "Rapport Hebdomadaire",
+        loading_report: "Chargement de l'analyse...",
+        label_stress_score: "Score de Stress",
+        report_no_data: "Pas assez de données pour le moment.",
+        label_weekly_avg: "Moyenne",
+        label_trend: "Tendance",
+        trend_stable: "Stable",
+        trend_improving: "En amélioration",
+        trend_worsening: "En aggravation",
+        label_suggestion: "Suggestion IA",
+        suggestion_general: "Maintenez une routine équilibrée.",
+        suggestion_sleep: "Améliorez la qualité du sommeil.",
+        suggestion_mood: "Essayez des jeux de relaxation.",
+        suggestion_heart: "Pratiquez la respiration.",
+        report_footer: "Basé sur vos {count} derniers contrôles"
     },
 
     // =========================================================================
@@ -530,7 +584,25 @@ const TRANSLATIONS = {
         constellation_title: "नक्षत्र जोड़ें",
         crew_title: "क्रू डैशबोर्ड",
         btn_offer_support: "सहयोग दें",
-        fallback_default_1: "मैं सुनने के लिए यहाँ हूँ। क्या आप मुझे और बता सकते हैं? 🌟"
+        fallback_default_1: "मैं सुनने के लिए यहाँ हूँ। क्या आप मुझे और बता सकते हैं? 🌟",
+        
+        // Analytics & Reports (NEW)
+        history_title: "तनाव का इतिहास",
+        report_title: "साप्ताहिक रिपोर्ट",
+        loading_report: "विश्लेषण लोड हो रहा है...",
+        label_stress_score: "तनाव स्कोर",
+        report_no_data: "अभी पर्याप्त डेटा नहीं है।",
+        label_weekly_avg: "औसत तनाव",
+        label_trend: "रुझान",
+        trend_stable: "स्थिर",
+        trend_improving: "सुधर रहा है",
+        trend_worsening: "बिगड़ रहा है",
+        label_suggestion: "AI सुझाव",
+        suggestion_general: "संतुलित दिनचर्या बनाए रखें।",
+        suggestion_sleep: "नींद की गुणवत्ता पर ध्यान दें।",
+        suggestion_mood: "मूड ठीक करने के लिए गेम खेलें।",
+        suggestion_heart: "रोजाना सांस लेने का व्यायाम करें।",
+        report_footer: "आपकी पिछली {count} जांचों पर आधारित"
     }
 };
 

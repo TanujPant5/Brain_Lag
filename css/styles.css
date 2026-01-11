@@ -1133,3 +1133,38 @@ select.input-field {
     background: var(--yellow-glow);
     animation: pulse 0.5s infinite;
 }
+
+/* =========================================
+   Analytics & Reports
+   ========================================= */
+
+.chart-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 250px;
+}
+
+/* Ensure chart maintains aspect ratio but fills container */
+canvas#stressChart {
+    border-radius: 0.5rem;
+}
+
+/* Responsive chart container adjustments */
+@media (max-width: 640px) {
+    #stressChart {
+        min-height: 200px;
+    }
+}
+
+/* Specific styling for the AI suggestion box in the weekly report */
+.suggestion-box {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(34, 211, 238, 0.05));
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.suggestion-box:hover {
+    border-color: var(--purple-glow);
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.1);
+}

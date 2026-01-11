@@ -6,6 +6,7 @@
     <title>ASTRA - AI Astronaut Wellness Companion</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     
@@ -359,6 +360,23 @@
                 </div>
             </div>
         </div>
+
+        <section class="mt-8 grid lg:grid-cols-2 gap-8">
+            <div class="card p-6">
+                <h2 class="font-orbitron font-bold text-lg mb-4" data-i18n="history_title">Stress History</h2>
+                <div class="relative h-64 w-full">
+                    <canvas id="stressChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card p-6">
+                <h2 class="font-orbitron font-bold text-lg mb-4" data-i18n="report_title">Weekly Report</h2>
+                <div id="weeklyReportContent" class="space-y-4">
+                    <p class="text-gray-400 text-sm" data-i18n="loading_report">Loading weekly analysis...</p>
+                </div>
+            </div>
+        </section>
+        
     </main>
 
     <div id="highStressModal" class="modal hidden">
